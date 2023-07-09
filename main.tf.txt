@@ -1,0 +1,125 @@
+# Initialize Terraform and configure the Azure provider
+provider "azurerm" {
+  features {}
+}
+
+# Create a resource group
+resource "azurerm_resource_group" "example_rg" {
+  name     = "my-resource-group"
+  location = "West US"
+}
+
+# Create a virtual network
+resource "azurerm_virtual_network" "example_vnet" {
+  name                = "my-vnet"
+  resource_group_name = azurerm_resource_group.example_rg.name
+  location            = azurerm_resource_group.example_rg.location
+  address_space       = ["10.0.0.0/16"]
+}
+
+# Create subnets for each tier
+resource "azurerm_subnet" "example_web_subnet" {
+  name                 = "web-subnet"
+  resource_group_name  = azurerm_resource_group.example_rg.name
+  virtual_network_name = azurerm_virtual_network.example_vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_subnet" "example_app_subnet" {
+  name                 = "app-subnet"
+  resource_group_name  = azurerm_resource_group.example_rg.name
+  virtual_network_name = azurerm_virtual_network.example_vnet.name
+  address_prefixes     = ["10.0.2.0/24"]
+}
+
+resource "azurerm_subnet" "example_data_subnet" {
+  name                 = "data-subnet"
+  resource_group_name  = azurerm_resource_group.example_rg.name
+  virtual_network_name = azurerm_virtual_network.example_vnet.name
+  address_prefixes     = ["10.0.3.0/24"]
+}
+
+# Create virtual machines for each tier
+resource "azurerm_linux_virtual_machine" "example_web_vm" {
+  name                = "web-vm"
+  resource_group_name = azurerm_resource_group.example_rg.name
+  location            = azurerm_resource_group.example_rg.location
+  size                = "Standard_DS2_v2"
+  admin_username      = "adminuser"
+  admin_password      = "password"
+  network_interface_ids = [
+    azurerm_network_interface.example_web_nic.id
+  ]
+}
+
+resource "azurerm_linux_virtual_machine" "example_app_vm" {
+  name                = "app-vm"
+  resource_group_name = azurerm_resource_group.example_rg.name
+  location            = azurerm_resource_group.example_rg.location
+  size                = "Standard_DS2_v2"
+  admin_username      = "adminuser"
+  admin_password      = "password"
+  network_interface_ids = [
+    azurerm_network_interface.example_app_nic.id
+  ]
+}
+
+resource "azurerm_linux_virtual_machine" "example_data_vm" {
+  name                = "data-vm"
+  resource_group_name = azurerm_resource_group.example_rg.name
+  location            = azurerm_resource_group.example_rg.location
+  size                = "Standard_DS2_v2"
+  admin_username      = "adminuser"
+  admin_password      = "password"
+  network_interface_ids = [
+    azurerm_network_interface.example_data_nic.id
+  ]
+}
+
+# Create network interfaces for each tier
+resource "azurerm_network_interface" "example_web_nic" {
+  name                = "web-nic"
+  resource_group_name = azurerm_resource_group.example_rg.name
+  location            = azurerm_resource_group.example_rg.location
+
+  ip_configuration {
+    name                          = "web-ipconfig"
+    subnet_id                     = azurerm_subnet.example_web_subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_network_interface" "example_app_nic" {
+  name                = "app-nic"
+  resource_group_name = azurerm_resource_group.example_rg.name
+  location            = azurerm_resource_group.example_rg.location
+
+  ip_configuration {
+    name                          = "app-ipconfig"
+    subnet_id                     = azurerm_subnet.example_app_subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_network_interface" "example_data_nic" {
+  name                = "data-nic"
+  resource_group_name = azurerm_resource_group.example_rg.name
+  location            = azurerm_resource_group.example_rg.location
+
+  ip_configuration {
+    name                          = "data-ipconfig"
+    subnet_id                     = azurerm_subnet.example_data_subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+
+
+
+Then Run 
+
+terraform init
+terraform plan
+terraform apply
+
+
