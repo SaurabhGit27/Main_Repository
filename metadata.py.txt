@@ -1,0 +1,21 @@
+import requests
+import json
+
+# Define the metadata endpoint URL
+metadata_endpoint = "http://169.254.169.254/metadata/instance?api-version=2021-02-01"
+
+# Define the headers to request JSON response
+headers = {"Metadata": "true"}
+
+# Send GET request to retrieve metadata
+response = requests.get(metadata_endpoint, headers=headers)
+
+# Check if the request was successful (status code 200)
+if response.status_code == 200:
+    # Get the JSON response
+    metadata = response.json()
+
+    # Print the metadata in JSON format
+    print(json.dumps(metadata, indent=4))
+else:
+    print("Failed to retrieve instance metadata.")
