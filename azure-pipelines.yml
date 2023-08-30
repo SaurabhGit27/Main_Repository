@@ -1,16 +1,20 @@
-# Starter pipeline
-
 trigger:
-- main
+- main  # Change to the branch where your code is
+
+pr:
+- none
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- script: |
+    terraform init
+    terraform plan -out=tfplan
+  displayName: 'Terraform Init and Plan'
+  workingDirectory: $(Build.SourcesDirectory)
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    terraform apply -auto-approve tfplan
+  displayName: 'Terraform Apply'
+  workingDirectory: $(Build.SourcesDirectory)
